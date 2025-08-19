@@ -3,12 +3,12 @@ r"""
 make_regex.py
 
 Generate a regex from a word or sentence that:
-- Matches letters explicitly in either case using brackets, e.g. [Aa]
-- Compresses consecutive identical letters/characters using {n}
-- Collapses any contiguous whitespace into \s+ (one or more whitespace)
-- Treats parentheses (...) as optional groups (?:...)? and handles nesting
- - Supports numeric placeholders {digit/number}, matching either the digits or the spelled-out text
- - Accented letters also match their unaccented counterparts (e.g. á -> [aAáÁ])
+    - Matches letters explicitly in either case using brackets, e.g. [Aa]
+    - Compresses consecutive identical letters/characters using {n}
+    - Collapses any contiguous whitespace into \s+ (one or more whitespace)
+    - Treats parentheses (...) as optional groups (?:...)? and handles nesting
+    - Supports numeric placeholders {digit/number}, matching either the digits or the spelled-out text
+    - Accented letters also match their unaccented counterparts (e.g. á -> [aAáÁ])
 
 Examples:
     python make_regex.py Hello
