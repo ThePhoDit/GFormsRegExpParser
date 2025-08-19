@@ -7,7 +7,8 @@ Generate a regex from a word or sentence that:
 - Compresses consecutive identical letters/characters using {n}
 - Collapses any contiguous whitespace into \s+ (one or more whitespace)
 - Treats parentheses (...) as optional groups (?:...)? and handles nesting
- - Supports numeric placeholders {digit/text}, matching either the digits or the spelled-out text
+ - Supports numeric placeholders {digit/number}, matching either the digits or the spelled-out text
+ - Accented letters also match their unaccented counterparts (e.g. á -> [aAáÁ])
 
 Examples:
     python make_regex.py Hello
@@ -22,6 +23,7 @@ Run:
 for help and more examples.
 """
 import re
+import unicodedata
 import sys
 import argparse
 
@@ -75,14 +77,33 @@ def make_regex_segment(s: str, i: int, end: int) -> (str, int):
         right_regex = build_regex(right)
         return f"(?:{left_regex})|(?:{right_regex})", j + 1
 
-    # letters: case-insensitive bracket and count repeats (only across plain chars)
+    # letters: case-insensitive bracket (with accent-insensitive variants) and count repeats
     if ch.isalpha():
         # count consecutive same-letter (case-insensitive)
         j = i + 1
         while j < end and s[j].isalpha() and s[j].lower() == ch.lower():
             j += 1
         count = j - i
-        part = f"[{ch.lower()}{ch.upper()}]"
+        # Build a bracket that includes the letter in both cases, plus the
+        # unaccented base letter in both cases if the input letter has accents.
+        def strip_accents(c: str) -> str:
+            # Decompose and drop combining marks
+            return "".join(ch for ch in unicodedata.normalize("NFD", c) if not unicodedata.combining(ch))
+
+        # Prepare ordered unique list: prefer base followed by original
+        ordered_chars = []
+        seen = set()
+        def add_c(c):
+            for v in (c.lower(), c.upper()):
+                if v not in seen:
+                    seen.add(v)
+                    ordered_chars.append(v)
+
+        base = strip_accents(ch)
+        if base and base.isalpha() and len(base) == 1 and base.lower() != ch.lower():
+            add_c(base)
+        add_c(ch)
+        part = "[" + "".join(ordered_chars) + "]"
         if count > 1:
             part += f"{{{count}}}"
         return part, j
