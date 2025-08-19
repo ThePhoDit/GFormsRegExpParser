@@ -9,6 +9,7 @@ It builds regexes that are:
 - **Optional groups**: parentheses `(...)` make their contents optional, supporting **nested parentheses**.
 - **Numeric/text placeholders**: curly braces with a slash `{digit/text}` expand into a regex that matches either the digit(s) or the spelled-out text (e.g. `{2/two}`).
 - **Alternatives**: pass two arguments; the script will output a regex matching either phrase.
+- **Accented letters**: accented letters also match their unaccented counterparts (e.g. á -> [aAáÁ])
 
 ---
 
